@@ -99,8 +99,8 @@ def main():
             action_before = action
 
         # If the market is about to close, cancel all orders and close all positions
-        if is_open and seconds_close <= seconds_before_closing:
-            logging.info("Market is closing in 2 minutes - cancel all orders and exit")
+        if is_open and time_until_close <= seconds_before_closing:
+            logging.info("Market is closing in soon - cancel all orders and exit")
             trading_bot.cancel_pending_orders()
             trading_bot.close_open_positions()
             break

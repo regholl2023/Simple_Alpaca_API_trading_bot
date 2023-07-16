@@ -17,6 +17,13 @@ The bot also relies on the `helper.py` module, which should be located in the sa
 
 ## Installation
 
+Export your Alpaca Market keys as environment variables:
+
+```
+export APCA_API_KEY_ID=your_key_here
+export APCA_API_SECRET_KEY=your_secret_key_here
+```
+
 ### Ubuntu 22.04
 
 ```
