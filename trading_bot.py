@@ -30,7 +30,7 @@ def main():
     parser.add_argument("-c", "--cash", type=float, default=200000, help="Cash for each buy trade")
     parser.add_argument("-n", "--ndays", type=int, default=8, help="Number of days to gather historical prices")
     parser.add_argument("-t", "--thresh", type=float, default=-2.0, help="Threshold number of Std-Deviations for Buy")
-    parser.add_argument("-w", "--window", type=int, default=51, help="Filter window in samples")
+    parser.add_argument("-w", "--window", type=int, default=0, help="Filter window in samples")
     parser.add_argument("-d", "--debug", action="store_true", help="Enable debug logging")
 
     # Parse the arguments
