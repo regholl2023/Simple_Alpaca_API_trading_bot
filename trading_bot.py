@@ -97,6 +97,8 @@ def main():
             elif action_before == "Buy" and action == "Sell" and ns <= window:
                 trading_bot.initiate_sell(symbol, cash)
             action_before = action
+        else:
+            print(f'Time until open {time_until_open} seconds')
 
         # If the market is about to close, cancel all orders and close all positions
         if is_open and time_until_close <= seconds_before_closing:
