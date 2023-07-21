@@ -266,6 +266,9 @@ class TradingBot:
         shares = next((pos[1] for pos in positions if pos[0] == stock), None)
         last_trade_price = self.fetch_last_trade_price(stock)
 
+        # Convert the avg_purchase_price to float before comparison
+        avg_purchase_price = float(avg_purchase_price) if avg_purchase_price else None
+
         if avg_purchase_price and last_trade_price > avg_purchase_price:
             logging.info(
                 f"Symbol {stock} average purchase price {avg_purchase_price} last trade price {last_trade_price}"

@@ -123,7 +123,7 @@ def main():
         if is_open and time_until_close <= seconds_before_closing:
             logging.info("Market is closing in soon - cancel all orders and exit")
             trading_bot.cancel_pending_orders()
-            trading_bot.close_open_positions()
+            # trading_bot.close_open_positions()
             break
 
         # Sleep for a while before the next iteration
