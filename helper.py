@@ -181,10 +181,19 @@ class TradingBot:
         self.cancel_pending_orders()
         positions = sorted(self.fetch_positions(), key=lambda x: -x[4])
 
+        print(positions)
+
+        # Flag to check if current symbol is in positions
+        symbol_found = False
+
         if positions:
             for position in positions:
-                if position[0] != symbol:
-                    self.execute_buy(symbol, cash, positions)
+                if position[0] == symbol:
+                    symbol_found = True
+
+        if not symbol_found:
+            print('trying to execute buy')
+            self.execute_buy(symbol, cash, positions)
 
     def execute_buy(self, stock, cash, positions):
         """

@@ -80,21 +80,40 @@ def main():
             if process.returncode == 0:
                 # Parse the output
                 bars_output = output.decode("utf-8").strip().split()
-                print(bars_output)
+
+                # Format and print output
+                print(
+                    "{:<5} {:>6} {:>4} {:>10.6f} {:>10.6f} {:>10.6f} {:>10.6f} {:>10.4f} {:>10.6f} {:<4} {:>10.6f} {:>10.4f} {:>3}".format(
+                        bars_output[0],
+                        int(bars_output[1]),
+                        int(bars_output[2]),
+                        round(float(bars_output[3]), 6),
+                        round(float(bars_output[4]), 6),
+                        round(float(bars_output[5]), 6),
+                        round(float(bars_output[6]), 6),
+                        round(float(bars_output[7]), 4),
+                        round(float(bars_output[8]), 6),
+                        bars_output[9],
+                        round(float(bars_output[10]), 6),
+                        round(float(bars_output[11]), 4),
+                        int(bars_output[12])
+                    )
+                )
             else:
                 # If there was an error, print it
                 print("Error:", error)
 
             # Parse the output
+            window_bars = int(bars_output[2])
             action = bars_output[9]
-            std = bars_output[10]
-            ns = bars_output[12]
+            std = float(bars_output[10])
+            ns = int(bars_output[12])
 
             # If the action is to buy, initiate a buy
-            if action_before == "Sell" and action == "Buy" and std < thresh and ns < window:
+            if action_before == "Sell" and action == "Buy" and std < thresh and ns < window_bars:
                 trading_bot.initiate_buy(symbol, cash)
             # If the action is to sell, initiate a sell
-            elif action_before == "Buy" and action == "Sell" and ns <= window:
+            elif action_before == "Buy" and action == "Sell" and ns <= window_bars:
                 trading_bot.initiate_sell(symbol, cash)
             action_before = action
         else:
