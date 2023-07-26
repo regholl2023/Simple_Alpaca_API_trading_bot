@@ -94,8 +94,10 @@ def calculate_start_date(ndays):
 
     return start_date
 
-def compute_symbol_statistics(symbol, data_close, filter_window, std_dev, detect_factor, num_samples):
-    
+
+def compute_symbol_statistics(
+    symbol, data_close, filter_window, std_dev, detect_factor, num_samples
+):
     def group_consecutives(data, stepsize=1):
         diff = np.diff(data)
         split_indices = np.flatnonzero(diff != stepsize) + 1
@@ -103,7 +105,9 @@ def compute_symbol_statistics(symbol, data_close, filter_window, std_dev, detect
 
     def normalize(data_close):
         scaler = StandardScaler()
-        data_close_normalized = scaler.fit_transform(data_close.reshape(-1, 1)).flatten()
+        data_close_normalized = scaler.fit_transform(
+            data_close.reshape(-1, 1)
+        ).flatten()
         return data_close_normalized
 
     def remove_trend(data_close, num_samples):
@@ -144,15 +148,21 @@ def compute_symbol_statistics(symbol, data_close, filter_window, std_dev, detect
         norm_gradient, norm_intercept = np.linalg.lstsq(
             trans_matrix, norm_data, rcond=None
         )[0]
-        gradient, intercept = np.linalg.lstsq(trans_matrix, data, rcond=None)[0]
+        gradient, intercept = np.linalg.lstsq(trans_matrix, data, rcond=None)[
+            0
+        ]
         return gradient, intercept, norm_gradient
 
     def find_extrema(data, height_threshold=5):
         padded = np.pad(data, (0, 1), "constant")
         mean = np.mean(data)
         std_dev = np.std(data)
-        peaks, _ = signal.find_peaks(padded, height=height_threshold * std_dev)
-        troughs, _ = signal.find_peaks(-padded, height=height_threshold * std_dev)
+        peaks, _ = signal.find_peaks(
+            padded, height=height_threshold * std_dev
+        )
+        troughs, _ = signal.find_peaks(
+            -padded, height=height_threshold * std_dev
+        )
         return padded, peaks, troughs
 
     if filter_window is None or filter_window == 0:
@@ -348,36 +358,36 @@ def run(args):
 
     print(data)
 
-    row_counts = data.groupby('symbol').size()
+    row_counts = data.groupby("symbol").size()
     print(row_counts)
     print("\n")
 
     # Parse the command-line arguments
     filter_window = args.filter_window
-    std_dev = args.std_dev 
+    std_dev = args.std_dev
     detect_factor = args.detect_factor
-    num_samples = args.samples 
+    num_samples = args.samples
 
     if filter_window is None or filter_window == 0:
         filter_window = num_samples // 10
         if (filter_window % 2) == 0:
             filter_window += 1
 
-    print (f'Filter window: {filter_window}')
+    print(f"Filter window: {filter_window}")
 
     # Create a mask for symbols that have at least 'samples'
-    mask = data['symbol'].map(data['symbol'].value_counts() >= num_samples)
+    mask = data["symbol"].map(data["symbol"].value_counts() >= num_samples)
 
     # Apply the mask to filter the DataFrame
     filtered_data = data[mask]
 
     # Select the last 'samples' for each symbol
-    selected_rows = filtered_data.groupby('symbol').tail(num_samples)
+    selected_rows = filtered_data.groupby("symbol").tail(num_samples)
 
-    row_counts = selected_rows.groupby('symbol').size()
+    row_counts = selected_rows.groupby("symbol").size()
     print(row_counts)
 
-    num_symbols = selected_rows['symbol'].nunique()
+    num_symbols = selected_rows["symbol"].nunique()
     print(num_symbols)
 
     # Define a DataFrame to store the results
@@ -400,14 +410,25 @@ def run(args):
 
     # Iterate over the symbols and process the fetched data
     for symbol in symbols:
-        data_close = selected_rows.loc[selected_rows['symbol'] == symbol, 'c'].to_numpy()
+        data_close = selected_rows.loc[
+            selected_rows["symbol"] == symbol, "c"
+        ].to_numpy()
         if len(data_close) == num_samples:
             data_close[-1] = rest_api.get_latest_trade(symbol).price
-            df_temp = compute_symbol_statistics(symbol, data_close, args.filter_window, args.std_dev, args.detect_factor, num_samples)
+            df_temp = compute_symbol_statistics(
+                symbol,
+                data_close,
+                args.filter_window,
+                args.std_dev,
+                args.detect_factor,
+                num_samples,
+            )
             df_all = df_all.append(df_temp)
 
     # Sort df_all
     df_all.sort_values(by=args.sort, inplace=True)
+
+    pd.set_option("display.max_rows", None, "display.max_columns", None)
 
     print(df_all)
 
@@ -459,7 +480,7 @@ if __name__ == "__main__":
         "--sort",
         "-sort",
         type=str,
-        nargs='+',
+        nargs="+",
         default=["action", "isamp_ago"],
         help="Columns to sort the final output (default: action isamp_ago)",
     )
