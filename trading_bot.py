@@ -5,7 +5,7 @@ import argparse
 import subprocess
 
 # Import the TradingBot class from the helper module
-from helper import TradingBot
+from trading_bot_helper import TradingBot
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -123,7 +123,7 @@ def main():
         if is_open and time_until_close <= seconds_before_closing:
             logging.info("Market is closing in soon - cancel all orders and exit")
             trading_bot.cancel_pending_orders()
-            # trading_bot.close_open_positions()
+            trading_bot.close_open_positions()
             break
 
         # Sleep for a while before the next iteration
