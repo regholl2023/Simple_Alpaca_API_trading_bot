@@ -7,20 +7,9 @@ import subprocess
 # Import the TradingBot class from the helper module
 from trading_bot_helper import TradingBot
 
-# Create a console handler with a higher log level
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.ERROR)
-
-# Create a file handler with a lower log level
-file_handler = logging.FileHandler(filename="trading_bot.log")
-file_handler.setLevel(logging.INFO)
-
-# Create a logger and add the handlers
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)  # set the lowest possible log level for the logger
-logger.addHandler(console_handler)
-logger.addHandler(file_handler)
-
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logging.basicConfig(filename="trading_bot.log", level=logging.INFO)
 
 def main():
     """
@@ -138,7 +127,7 @@ def main():
 
         # If the market is about to close, cancel all orders and close all positions
         if is_open and time_until_close <= seconds_before_closing:
-            logger.info("Market is closing in soon - cancel all orders and exit")
+            logging.info("Market is closing in soon - cancel all orders and exit")
             trading_bot.cancel_pending_orders()
             trading_bot.close_open_positions()
             break
