@@ -60,14 +60,14 @@ def main():
     num_samples = args.num_samples
     test = args.test
 
-    logger.info(
+    print(
         f"Parameters:\n"
-        f"  SYMBOL:  (-s)  Stock symbol                                {symbol}\n"
-        f"  CASH:    (-c)  Cash for each buy trade                     {cash}\n"
-        f"  NDAYS:   (-n)  Number of days to gather historical prices  {ndays}\n"
-        f"  THRESH:  (-t)  Threshold number of Std-Deviations for Buy  {thresh}\n"
-        f"  WINDOW:  (-w)  Filter window in samples                    {window}\n"
-        f"  NS:      (-ns) Number of samples to pass for bars analysis {num_samples}\n"
+        f"  SYMBOL:  (-s)  Stock symbol                                {symbol:>10}\n"
+        f"  CASH:    (-c)  Cash for each buy trade                     {cash:>10}\n"
+        f"  NDAYS:   (-n)  Number of days to gather historical prices  {ndays:>10}\n"
+        f"  THRESH:  (-t)  Threshold number of Std-Deviations for Buy  {thresh:>10}\n"
+        f"  WINDOW:  (-w)  Filter window in samples                    {window:>10}\n"
+        f"  NS:      (-ns) Number of samples to pass for bars analysis {num_samples:>10}\n"
     )
 
     # Main trading loop
