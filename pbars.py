@@ -355,12 +355,7 @@ def run(args):
 
     # Fetch the historical data
     data = fetch_historical_data_v2(symbols, start_date, end_date)
-
-    print(data)
-
     row_counts = data.groupby("symbol").size()
-    print(row_counts)
-    print("\n")
 
     # Parse the command-line arguments
     filter_window = args.filter_window
@@ -383,12 +378,10 @@ def run(args):
 
     # Select the last 'samples' for each symbol
     selected_rows = filtered_data.groupby("symbol").tail(num_samples)
-
     row_counts = selected_rows.groupby("symbol").size()
-    print(row_counts)
 
     num_symbols = selected_rows["symbol"].nunique()
-    print(num_symbols)
+    print(f'Number of symbols processed: {num_symbols}')
 
     # Define a DataFrame to store the results
     df_all = pd.DataFrame(
@@ -429,6 +422,7 @@ def run(args):
     df_all.sort_values(by=args.sort, inplace=True)
 
     pd.set_option("display.max_rows", None, "display.max_columns", None)
+    pd.set_option('display.expand_frame_repr', False)
 
     print(df_all)
 
