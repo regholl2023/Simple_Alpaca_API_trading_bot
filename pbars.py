@@ -189,6 +189,9 @@ def compute_symbol_statistics(
         ],
     )
 
+    # Make a copy of price data array
+    data_orig = data_close
+
     # Store actual price now
     price_now = data_close[-1]
 
@@ -318,11 +321,11 @@ def compute_symbol_statistics(
     ) * 100
 
     # Calculate mean and standard deviation of data_orig
-    mean_value = np.mean(data_close)
-    std_dev = np.std(data_close)
+    mean_value = np.mean(data_orig)
+    std_dev = np.std(data_orig)
 
     # Calculate detect_value as a z-score
-    detect_value = (data_close[-1] - mean_value) / abs(std_dev)
+    detect_value = (data_orig[-1] - mean_value) / abs(std_dev)
 
     # Append values to a DataFrame
     df_temp.loc[symbol] = [
