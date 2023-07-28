@@ -84,7 +84,7 @@ df_temp = pd.DataFrame(
         "std_dev",
         "last_velocity",
         "detect_value",
-        "test_factor",
+        "price_now",
         "trend_diff",
         "action",
         "action_price",
@@ -129,7 +129,9 @@ remove_trend = data_filter = np.zeros(num_samples)
 
 def normalize(data_close):
     scaler = StandardScaler()
-    data_close_normalized = scaler.fit_transform(data_close.reshape(-1, 1)).flatten()
+    data_close_normalized = scaler.fit_transform(
+        data_close.reshape(-1, 1)
+    ).flatten()
     return data_close_normalized
 
 
@@ -188,8 +190,8 @@ def find_extrema(data, height_threshold=5):
 
 
 try:
-    # Set the last element of data_close to the current price
-    data_close[-1] = current_price
+    # Set the last element of data_close and price_now to the current price
+    data_close[-1] = price_now = current_price
 
     # Set data_orig equal to data_close
     data_orig = data_close
@@ -197,6 +199,7 @@ try:
     # Normalize data_close if std_dev is 1
     if args.std_dev == 1:
         data_close = normalize(data_close)
+        current_price = data_close[-1]
 
     # Remove trend from data_close and calculate gradient and intercept
     remove_trend, gradient, intercept = remove_trend(data_close, num_samples)
@@ -209,9 +212,6 @@ try:
     # Calculate mean and standard deviation of data_close
     mean_value = np.mean(data_close)
     std_dev = np.std(data_close)
-
-    # Calculate test_factor as a z-score
-    test_factor = (current_price - mean_value) / std_dev
 
     # Calculate first and second derivatives of data_filter and data_close
     first_derivative, first_derivative_raw = compute_derivatives(
@@ -335,7 +335,7 @@ try:
         std_dev,
         velocity[-1],
         detect_value,
-        test_factor,
+        price_now,
         trend_diff,
         action,
         action_price,

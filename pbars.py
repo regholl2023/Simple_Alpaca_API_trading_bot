@@ -43,6 +43,7 @@ def fetch_historical_data_v2(
             "timeframe": timeframe,
             "limit": limit,
             "adjustment": "split",
+            "feed": "sip",
         }
         if page_token is not None:
             params["page_token"] = page_token
@@ -179,7 +180,7 @@ def compute_symbol_statistics(
             "std_dev",
             "last_velocity",
             "detect_value",
-            "test_factor",
+            "price_now",
             "trend_diff",
             "action",
             "action_price",
@@ -187,6 +188,9 @@ def compute_symbol_statistics(
             "isamp_ago",
         ],
     )
+
+    # Store actual price now
+    price_now = data_close[-1]
 
     # Normalize data_close if std_dev is 1
     if std_dev == 1:
@@ -205,9 +209,6 @@ def compute_symbol_statistics(
     # Calculate mean and standard deviation of data_close
     mean_value = np.mean(data_close)
     std_dev = np.std(data_close)
-
-    # Calculate test_factor as a z-score
-    test_factor = (current_price - mean_value) / std_dev
 
     # Calculate first and second derivatives of data_filter and data_close
     first_derivative, first_derivative_raw = compute_derivatives(
@@ -331,7 +332,7 @@ def compute_symbol_statistics(
         std_dev,
         velocity[-1],
         detect_value,
-        test_factor,
+        price_now,
         trend_diff,
         action,
         action_price,
@@ -357,6 +358,8 @@ def run(args):
     data = fetch_historical_data_v2(symbols, start_date, end_date)
     row_counts = data.groupby("symbol").size()
 
+    print ( row_counts )
+
     # Parse the command-line arguments
     filter_window = args.filter_window
     std_dev = args.std_dev
@@ -381,7 +384,7 @@ def run(args):
     row_counts = selected_rows.groupby("symbol").size()
 
     num_symbols = selected_rows["symbol"].nunique()
-    print(f'Number of symbols processed: {num_symbols}')
+    print(f"Number of symbols processed: {num_symbols}")
 
     # Define a DataFrame to store the results
     df_all = pd.DataFrame(
@@ -392,7 +395,7 @@ def run(args):
             "std_dev",
             "last_velocity",
             "detect_value",
-            "test_factor",
+            "price_now",
             "trend_diff",
             "action",
             "action_price",
@@ -422,7 +425,7 @@ def run(args):
     df_all.sort_values(by=args.sort, inplace=True)
 
     pd.set_option("display.max_rows", None, "display.max_columns", None)
-    pd.set_option('display.expand_frame_repr', False)
+    pd.set_option("display.expand_frame_repr", False)
 
     print(df_all)
 
