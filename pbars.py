@@ -361,7 +361,7 @@ def run(args):
     data = fetch_historical_data_v2(symbols, start_date, end_date)
     row_counts = data.groupby("symbol").size()
 
-    print ( row_counts )
+    print(row_counts)
 
     # Parse the command-line arguments
     filter_window = args.filter_window
@@ -481,8 +481,8 @@ if __name__ == "__main__":
         "-sort",
         type=str,
         nargs="+",
-        default=["action", "isamp_ago"],
-        help="Columns to sort the final output (default: action isamp_ago)",
+        default=["action", "current_price"],
+        help="Columns to sort the final output (default: action current_price)",
     )
     arguments = parser.parse_args()
 
