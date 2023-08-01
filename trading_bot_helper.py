@@ -145,7 +145,7 @@ class TradingBot:
             action,
             stock,
             limit,
-            shares,
+            int(shares),  # Convert shares to integer before logging
             extended_hours,
         )
 
@@ -192,7 +192,7 @@ class TradingBot:
                     symbol_found = True
 
         if not symbol_found:
-            print('trying to execute buy')
+            print("trying to execute buy")
             self.execute_buy(symbol, cash, positions)
 
     def execute_buy(self, stock, cash, positions):
@@ -267,7 +267,9 @@ class TradingBot:
         last_trade_price = self.fetch_last_trade_price(stock)
 
         # Convert the avg_purchase_price to float before comparison
-        avg_purchase_price = float(avg_purchase_price) if avg_purchase_price else None
+        avg_purchase_price = (
+            float(avg_purchase_price) if avg_purchase_price else None
+        )
 
         if avg_purchase_price and last_trade_price > avg_purchase_price:
             logging.info(
