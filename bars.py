@@ -29,14 +29,13 @@ pd.set_option("display.width", 1000)
 pd.set_option("display.max_rows", None, "display.max_columns", None)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--symbol", type=str)
-parser.add_argument("--num_days", type=int, default=8)
-parser.add_argument("--filter_window", type=int)
-parser.add_argument("--plot_switch", type=int, default=1)
-parser.add_argument("--std_dev", type=int, default=0)
-parser.add_argument("--detect_factor", type=float, default=0.10)
-parser.add_argument("--num_samples", type=int, default=1000)
-
+parser.add_argument("--symbol", "-s", type=str)
+parser.add_argument("--num_days", "-n", type=int, default=8)
+parser.add_argument("--filter_window", "-f", type=int)
+parser.add_argument("--plot_switch", "-p", type=int, default=1)
+parser.add_argument("--std_dev", "-d", type=int, default=0)
+parser.add_argument("--detect_factor", "-df", type=float, default=0.10)
+parser.add_argument("--num_samples", "-ns", type=int, default=1000)
 args = parser.parse_args()
 
 if args.symbol is not None:
