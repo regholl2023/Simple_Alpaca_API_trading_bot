@@ -13,6 +13,7 @@ from matplotlib.patches import Rectangle
 from sklearn.preprocessing import StandardScaler
 from alpaca_trade_api.rest import REST, TimeFrame
 
+
 class CommandLineArgs:
     def __init__(self):
         self.args = self._parse_arguments()
@@ -24,7 +25,9 @@ class CommandLineArgs:
         parser.add_argument("--filter_window", "-f", type=int)
         parser.add_argument("--plot_switch", "-p", type=int, default=1)
         parser.add_argument("--std_dev", "-d", type=int, default=0)
-        parser.add_argument("--detect_factor", "-df", type=float, default=0.10)
+        parser.add_argument(
+            "--detect_factor", "-df", type=float, default=0.10
+        )
         parser.add_argument("--num_samples", "-ns", type=int, default=1000)
         return parser.parse_args()
 
@@ -56,6 +59,7 @@ class CommandLineArgs:
     def num_samples(self):
         return self.args.num_samples
 
+
 class StockAnalyzer:
     def __init__(self, args):
         self._initialize_plotting()
@@ -72,7 +76,9 @@ class StockAnalyzer:
         self.API_KEY_ID = os.environ["APCA_API_KEY_ID"]
         self.SECRET_KEY_ID = os.environ["APCA_API_SECRET_KEY"]
         self.BASE_URL = os.environ["APCA_API_BASE_URL"]
-        self.rest_api = REST(self.API_KEY_ID, self.SECRET_KEY_ID, self.BASE_URL)
+        self.rest_api = REST(
+            self.API_KEY_ID, self.SECRET_KEY_ID, self.BASE_URL
+        )
 
     def _initialize_parameters(self, args):
         self.symbol = args.symbol.upper()
@@ -105,7 +111,9 @@ class StockAnalyzer:
         self.start_dt = self.end_dt - pd.Timedelta(f"{self.num_days} days")
         self._from = self.start_dt.strftime("%Y-%m-%d")
         self.to_end = self.end_dt.strftime("%Y-%m-%d")
-        self.nyse_schedule = self.nyse.schedule(start_date=self._from, end_date=self.to_end)
+        self.nyse_schedule = self.nyse.schedule(
+            start_date=self._from, end_date=self.to_end
+        )
         self._to_date = str(self.nyse_schedule.index[-1]).split(" ")[0]
 
     def _set_company_name(self):
@@ -191,7 +199,10 @@ class StockAnalyzer:
             print(" ")
             print("Symbol = ", self.symbol)
             print("Velocity detect factor = ", self.detect_factor)
-            print("Number of days to collect historical prices = ", self.num_days)
+            print(
+                "Number of days to collect historical prices = ",
+                self.num_days,
+            )
 
         try:
             bars = self.rest_api.get_bars(
@@ -202,12 +213,16 @@ class StockAnalyzer:
                 adjustment="split",
             ).df[["close"]]
             self.data_close = bars.close.values[-self.num_samples :]
-            self.current_price = self.rest_api.get_latest_trade(self.symbol).price
+            self.current_price = self.rest_api.get_latest_trade(
+                self.symbol
+            ).price
             if self.current_price != self.data_close[-1]:
                 self.data_close[-1] = float(self.current_price)
             self.num_samples = len(self.data_close)
         except:
-            print("Historical data not found, is the symbol correct? --> exiting")
+            print(
+                "Historical data not found, is the symbol correct? --> exiting"
+            )
             sys.exit(0)
 
         if self.filter_window is None or self.filter_window == 0:
@@ -224,7 +239,9 @@ class StockAnalyzer:
         self.data_orig = self.data_close
 
         self.data_close = (
-            self.normalize(self.data_close) if self.std_dev == 1 else self.data_close
+            self.normalize(self.data_close)
+            if self.std_dev == 1
+            else self.data_close
         )
 
         (
@@ -249,7 +266,9 @@ class StockAnalyzer:
             self.first_derivative_raw,
         ) = self.compute_derivatives(self.data_filter, self.data_close)
 
-        self.padded, self.peaks, self.troughs = self.find_extrema(self.first_derivative_raw)
+        self.padded, self.peaks, self.troughs = self.find_extrema(
+            self.first_derivative_raw
+        )
 
         mean = np.mean(self.first_derivative)
         std = np.std(self.first_derivative)
@@ -264,10 +283,18 @@ class StockAnalyzer:
         gap_max = self.group_consecutives(self.max_)
 
         gap_array = [
-            ind for group in gap_min for ind in [group[0], group[-1]] if group.size > 0
+            ind
+            for group in gap_min
+            for ind in [group[0], group[-1]]
+            if group.size > 0
         ]
         gap_array.extend(
-            [ind for group in gap_max for ind in [group[0], group[-1]] if group.size > 0]
+            [
+                ind
+                for group in gap_max
+                for ind in [group[0], group[-1]]
+                if group.size > 0
+            ]
         )
 
         gap_array = np.append(gap_array, 1)
@@ -285,8 +312,12 @@ class StockAnalyzer:
         last = "None"
 
         for val1, val2 in zip(gap_array[:-1], gap_array[1:]):
-            index_min = max(mina_[(val1 <= mina_) & (mina_ <= val2)], default=0)
-            index_max = max(maxa_[(val1 <= maxa_) & (maxa_ <= val2)], default=0)
+            index_min = max(
+                mina_[(val1 <= mina_) & (mina_ <= val2)], default=0
+            )
+            index_max = max(
+                maxa_[(val1 <= maxa_) & (maxa_ <= val2)], default=0
+            )
 
             if index_min > 0 or index_max > 0:
                 if index_min > index_max:
@@ -318,7 +349,9 @@ class StockAnalyzer:
         if self.std_dev == 1:
             self.price_now = self.data_orig[-1]
 
-        gradient, intercept, norm_gradient = self.compute_avo_attributes(self.data_close)
+        gradient, intercept, norm_gradient = self.compute_avo_attributes(
+            self.data_close
+        )
 
         trend_diff = (
             (self.data_close[isamp] - (gradient * isamp + intercept))
@@ -467,6 +500,7 @@ class StockAnalyzer:
         else:
             print(self.df_temp)
 
+
 def main():
     args = CommandLineArgs()
     if args.symbol is not None:
@@ -486,6 +520,7 @@ def main():
         print(f"Symbol: {analyzer.symbol} caused an error")
         analyzer.df_temp.drop([analyzer.symbol], inplace=True)
         print(analyzer.df_temp)
+
 
 if __name__ == "__main__":
     main()
