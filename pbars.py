@@ -351,7 +351,7 @@ def run(args):
 
     # Read the list of symbols from the file
     with open(args.list, "r") as f:
-        symbols = [line.strip().upper() for line in f]
+        symbols = [line.split()[0].upper() for line in f]
 
     # Calculate the start date
     start_date = calculate_start_date(args.ndays).strftime("%Y-%m-%d")
