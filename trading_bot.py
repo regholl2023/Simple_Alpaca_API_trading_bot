@@ -11,6 +11,7 @@ from trading_bot_helper import TradingBot
 logging.basicConfig(level=logging.INFO)
 logging.basicConfig(filename="trading_bot.log", level=logging.INFO)
 
+
 def main():
     """
     Main function for the trading bot. This function handles argument parsing, sets up the trading bot,
@@ -26,13 +27,43 @@ def main():
 
     # Set up argument parser
     parser = argparse.ArgumentParser(description="Stock trading bot.")
-    parser.add_argument("-s", "--symbol", required=True, help="Stock symbol to trade")
-    parser.add_argument("-c", "--cash", type=float, default=200000, help="Cash for each buy trade")
-    parser.add_argument("-n", "--ndays", type=int, default=8, help="Number of days to gather historical prices")
-    parser.add_argument("-t", "--thresh", type=float, default=-2.0, help="Threshold number of Std-Deviations for Buy")
-    parser.add_argument("-w", "--window", type=int, default=0, help="Filter window in samples")
-    parser.add_argument("-ns", "--num_samples", type=int, default=5000, help="Number of samples for the bars")
-    parser.add_argument("--test", action="store_true", help="Test the parameters")
+    parser.add_argument(
+        "-s", "--symbol", required=True, help="Stock symbol to trade"
+    )
+    parser.add_argument(
+        "-c",
+        "--cash",
+        type=float,
+        default=200000,
+        help="Cash for each buy trade",
+    )
+    parser.add_argument(
+        "-n",
+        "--ndays",
+        type=int,
+        default=8,
+        help="Number of days to gather historical prices",
+    )
+    parser.add_argument(
+        "-t",
+        "--thresh",
+        type=float,
+        default=-2.0,
+        help="Threshold number of Std-Deviations for Buy",
+    )
+    parser.add_argument(
+        "-w", "--window", type=int, default=0, help="Filter window in samples"
+    )
+    parser.add_argument(
+        "-ns",
+        "--num_samples",
+        type=int,
+        default=5000,
+        help="Number of samples for the bars",
+    )
+    parser.add_argument(
+        "--test", action="store_true", help="Test the parameters"
+    )
 
     # Parse the arguments
     args = parser.parse_args()
@@ -62,7 +93,11 @@ def main():
     # Main trading loop
     while True:
         # Fetch market clock info
-        is_open, time_until_open, time_until_close = trading_bot.fetch_market_clock_info()
+        (
+            is_open,
+            time_until_open,
+            time_until_close,
+        ) = trading_bot.fetch_market_clock_info()
 
         if test:
             is_open = True
@@ -78,7 +113,9 @@ def main():
             command = f"bars --symbol {symbol} --num_days {ndays} --filter_window {window} --plot_switch 0 --std_dev 1 --num_samples {num_samples} | tail -1"
 
             # Execute the command and fetch the output
-            process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
+            process = subprocess.Popen(
+                command, stdout=subprocess.PIPE, shell=True
+            )
             output, error = process.communicate()
 
             # If the command was successful...
@@ -101,7 +138,7 @@ def main():
                         bars_output[9],
                         round(float(bars_output[10]), 6),
                         round(float(bars_output[11]), 4),
-                        int(bars_output[12])
+                        int(bars_output[12]),
                     )
                 )
             else:
@@ -116,24 +153,38 @@ def main():
             ns = int(bars_output[12])
 
             # If the action is to buy, initiate a buy
-            if action_before == "Sell" and action == "Buy" and std < thresh and ns < window_bars and test == False:
+            if (
+                action_before == "Sell"
+                and action == "Buy"
+                and std < thresh
+                and ns < window_bars
+                and test == False
+            ):
                 trading_bot.initiate_buy(symbol, cash)
             # If the action is to sell, initiate a sell
-            elif action_before == "Buy" and action == "Sell" and ns <= window_bars and test == False:
+            elif (
+                action_before == "Buy"
+                and action == "Sell"
+                and ns <= window_bars
+                and test == False
+            ):
                 trading_bot.initiate_sell(symbol, cash)
             action_before = action
         else:
-            print(f'Time until open {time_until_open} seconds')
+            print(f"Time until open {time_until_open} seconds")
 
         # If the market is about to close, cancel all orders and close all positions
         if is_open and time_until_close <= seconds_before_closing:
-            logging.info("Market is closing in soon - cancel all orders and exit")
+            logging.info(
+                "Market is closing in soon - cancel all orders and exit"
+            )
             trading_bot.cancel_pending_orders()
             trading_bot.close_open_positions()
             break
 
         # Sleep for a while before the next iteration
         time.sleep(sleep_time)
+
 
 if __name__ == "__main__":
     main()
